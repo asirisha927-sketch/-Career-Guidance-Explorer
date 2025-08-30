@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Career Guidance Explorer</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #11172d;
+      --card: #151c36;
+      --accent: #6ee7ff;
+      --accent-2: #a78bfa;
+      --text: #e6e9f5;
+      --muted: #9aa3b2;
+      --ring: rgba(110, 231, 255, .35);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--text);
+      background:
+        radial-gradient(1200px 700px at 10% -10%, rgba(167,139,250,.20), transparent 60%),
+        radial-gradient(900px 500px at 90% 10%, rgba(110,231,255,.18), transparent 55%),
+        linear-gradient(180deg, #0b1020, #0c1226 40%, #0b1020);
+    }
+
+    header {
+      position: sticky; top: 0; z-index: 20;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, rgba(11,16,32,.9), rgba(11,16,32,.65));
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+
+    .title {
+      display: flex; align-items: center; gap: 14px; padding: 8px 0 12px;
+    }
+    .title .logo {
+      width: 40px; height: 40px; border-radius: 12px; background:
+        radial-gradient(60% 60% at 30% 20%, rgba(110,231,255,.9), transparent 60%),
+        radial-gradient(50% 50% at 70% 70%, rgba(167,139,250,.9), transparent 60%),
+        linear-gradient(135deg, #1b274d, #0f1630);
+      box-shadow: 0 6px 24px rgba(110,231,255,.25), inset 0 0 0 1px rgba(255,255,255,.08);
+    }
+    .title h1 { font-size: 1.35rem; margin: 0; letter-spacing: .3px; }
+    .title p { margin: 0; color: var(--muted); font-size: .95rem; }
+
+    .controls {
+      margin-top: 14px;
+      display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 12px;
+      align-items: end;
+    }
+
+    .field { display: grid; gap: 6px; }
+    .field label { font-size: .85rem; color: var(--muted); }
+
+    select, button, input[type="search"] {
+      appearance: none;
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: .95rem;
+      outline: none;
+      transition: box-shadow .15s ease, border-color .15s ease, transform .03s ease;
+    }
+    select:focus, input[type="search"]:focus {
+      box-shadow: 0 0 0 4px var(--ring);
+      border-color: rgba(110,231,255,.6);
+    }
+
+    button.primary {
+      background: linear-gradient(135deg, var(--accent-2), var(--accent));
+      color: #0a0f22; font-weight: 600; border: none;
+      padding: 11px 14px; cursor: pointer;
+      box-shadow: 0 10px 20px rgba(110,231,255,.25);
+    }
+    button.primary:active { transform: translateY(1px); }
+
+    main { padding: 24px 0 60px; }
+
+    .grid {
+      display: grid; grid-template-columns: repeat(12, 1fr); gap: 14px;
+    }
+
+    .card {
+      grid-column: span 4;
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 16px;
+      padding: 16px;
+      display: grid; gap: 8px;
+      position: relative; overflow: hidden;
+      transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+      cursor: pointer;
+    }
+
+    .card:hover { transform: translateY(-2px); border-color: rgba(110,231,255,.35);
+      box-shadow: 0 12px 28px rgba(0,0,0,.35), inset 0 0 0 1px rgba(110,231,255,.12);
+    }
+
+    .card h3 { margin: 0; font-size: 1.05rem; letter-spacing: .2px; }
+    .badge { font-size: .75rem; color: var(--muted); }
+    .meta { font-size: .86rem; color: var(--muted); }
+
+    .details {
+      margin-top: 22px;
+      background: linear-gradient(180deg, rgba(167,139,250,.12), rgba(110,231,255,.06));
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .details h2 { margin: 0 0 6px; font-size: 1.15rem; }
+    .details p { margin: 6px 0; color: var(--text); }
+    .details ul { margin: 8px 0 0 16px; color: var(--text); }
+
+    .empty {
+      color: var(--muted); text-align: center; padding: 24px; border: 1px dashed rgba(255,255,255,.15);
+      border-radius: 16px; background: rgba(255,255,255,.02);
+    }
+
+    footer { border-top: 1px solid rgba(255,255,255,.06); }
+    footer .container { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .small { color: var(--muted); font-size: .85rem; }
+
+    @media (max-width: 900px) {
+      .controls { grid-template-columns: 1fr 1fr; }
+      .card { grid-column: span 6; }
+    }
+    @media (max-width: 640px) {
+      .controls { grid-template-columns: 1fr; }
+      .card { grid-column: span 12; }
+      .title h1 { font-size: 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="title">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Career Guidance Explorer</h1>
+          <p>Find branches & courses after Intermediate, B.Tech, or Degree</p>
+        </div>
+      </div>
+      <div class="controls" id="controls">
+        <div class="field">
+          <label for="level">Education Level</label>
+          <select id="level" aria-label="Education Level">
+            <option value="Intermediate">Intermediate (10+2)</option>
+            <option value="BTech">B.Tech</option>
+            <option value="Degree">Degree</option>
+          </select>
+        </div>
+
+        <div class="field" id="subFieldWrap" style="display:none">
+          <label id="subLabel" for="subField">Stream / Program</label>
+          <select id="subField" aria-label="Stream or Program"></select>
+        </div>
+
+        <div class="field">
+          <label for="q">Search (branch/course)</label>
+          <input id="q" type="search" placeholder="e.g., CSE, B.Sc Computer Science, Nursing" />
+        </div>
+
+        <button class="primary" id="printBtn" title="Print or save as PDF">Print / Save</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div id="results" class="grid" aria-live="polite"></div>
+    <div id="details" class="details" hidden></div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p class="small">Tip: Use the search box to quickly filter branches. Click a card to view basic information.</p>
+      <p class="small">Project idea by you · Built with HTML/CSS + a little JS</p>
+    </div>
+  </footer>
+
+  <script>
+    // --- Data Model ---------------------------------------------------------
+    const DATA = {
+      Intermediate: {
+        _subLabel: "Intermediate Stream",
+        _sub: ["MPC", "BiPC", "CEC", "HEC"],
+        MPC: [
+          { type: "B.Tech", name: "CSE", duration: "4 years", subjects: ["Programming", "DSA", "DBMS", "OS"], careers: ["Software Engineer", "Data Engineer"] },
+          { type: "B.Tech", name: "ECE", duration: "4 years", subjects: ["Circuits", "Signals", "Communications"], careers: ["Embedded Engineer", "VLSI"] },
+          { type: "B.Tech", name: "EEE", duration: "4 years", subjects: ["Power Systems", "Machines"], careers: ["Electrical Engineer", "Power Analyst"] },
+          { type: "B.Tech", name: "IT", duration: "4 years", subjects: ["Networks", "Web", "Cloud Basics"], careers: ["System Admin", "Full‑stack Dev"] },
+          { type: "B.Tech", name: "AI & ML", duration: "4 years", subjects: ["Python", "ML", "Maths for AI"], careers: ["ML Engineer", "Data Scientist"] },
+          { type: "B.Tech", name: "Civil", duration: "4 years", subjects: ["Structures", "Surveying"], careers: ["Site Engineer", "Structural Analyst"] },
+          { type: "B.Tech", name: "Mechanical", duration: "4 years", subjects: ["Thermo", "Design"], careers: ["Design Engineer", "Manufacturing"] },
+          { type: "B.Sc", name: "Mathematics", duration: "3 years", subjects: ["Algebra", "Calculus", "Statistics"], careers: ["Analyst", "Academia"] },
+          { type: "B.Sc", name: "Physics", duration: "3 years", subjects: ["Mechanics", "EM", "QM"], careers: ["Research Assistant", "Testing"] },
+          { type: "B.Sc", name: "Computer Science", duration: "3 years", subjects: ["Programming", "DSA"], careers: ["Software Dev", "QA"] },
+          { type: "BCA", name: "Computer Applications", duration: "3 years", subjects: ["Programming", "Web"], careers: ["Software Dev", "Support Engineer"] },
+          { type: "B.Arch", name: "Architecture", duration: "5 years", subjects: ["Design Studio", "Structures"], careers: ["Architect", "Urban Planner"] },
+        ],
+        BiPC: [
+          { type: "MBBS", name: "Medicine", duration: "5.5 years", subjects: ["Anatomy", "Physiology"], careers: ["Doctor", "Public Health"] },
+          { type: "BDS", name: "Dental Surgery", duration: "5 years", subjects: ["Oral Anatomy", "Prosthodontics"], careers: ["Dentist"] },
+          { type: "B.Pharm", name: "Pharmacy", duration: "4 years", subjects: ["Pharmaceutics", "Pharmacology"], careers: ["Pharmacist", "QA/QC"] },
+          { type: "Pharm D", name: "Doctor of Pharmacy", duration: "6 years", subjects: ["Clinical Pharmacy"], careers: ["Clinical Pharmacist"] },
+          { type: "B.Sc", name: "Biotechnology", duration: "3 years", subjects: ["Genetics", "Bioprocess"], careers: ["Biotech Associate"] },
+          { type: "B.Sc", name: "Microbiology", duration: "3 years", subjects: ["Microbial Tech"], careers: ["Lab Technologist"] },
+          { type: "BPT", name: "Physiotherapy", duration: "4.5 years", subjects: ["Anatomy", "Therapy"], careers: ["Physiotherapist"] },
+          { type: "B.Sc", name: "Nursing", duration: "4 years", subjects: ["Nursing", "Community Health"], careers: ["Nurse", "Healthcare Admin"] },
+          { type: "AYUSH", name: "BAMS/ BHMS/ BNYS", duration: "5.5 years", subjects: ["Traditional Medicine"], careers: ["Practitioner"] },
+        ],
+        CEC: [
+          { type: "B.Com", name: "General", duration: "3 years", subjects: ["Accounting", "Economics"], careers: ["Accountant", "Banking"] },
+          { type: "B.Com", name: "Computers", duration: "3 years", subjects: ["Accounting", "IT"], careers: ["Data Entry", "Tally"] },
+          { type: "BBA", name: "Management", duration: "3 years", subjects: ["Marketing", "Finance"], careers: ["Management Trainee"] },
+          { type: "BA", name: "Economics", duration: "3 years", subjects: ["Micro/Macro"], careers: ["Analyst", "UPSC Foundations"] },
+          { type: "Professional", name: "CA/CS/CMA (with B.Com)", duration: "3+ years", subjects: ["Tax", "Law"], careers: ["Chartered Accountant"] },
+        ],
+        HEC: [
+          { type: "BA", name: "History, Economics, Pol. Sci.", duration: "3 years", subjects: ["History", "Economics", "Polity"], careers: ["Civil Services", "Policy"] },
+          { type: "B.Com", name: "General", duration: "3 years", subjects: ["Accounting", "Mgmt"], careers: ["Accountant", "Admin"] },
+          { type: "BBA", name: "Business Administration", duration: "3 years", subjects: ["Marketing", "HR"], careers: ["Operations", "Sales"] },
+        ]
+      },
+
+      BTech: {
+        _subLabel: null,
+        _sub: null,
+        list: [
+          { name: "CSE", duration: "4 years", subjects: ["Programming", "Algorithms", "AI"], careers: ["Software Engineer", "SDE"] },
+          { name: "IT", duration: "4 years", subjects: ["Networks", "Web", "Cloud"], careers: ["DevOps", "Full‑stack Dev"] },
+          { name: "ECE", duration: "4 years", subjects: ["VLSI", "Signals"], careers: ["Embedded", "Chip Design"] },
+          { name: "EEE", duration: "4 years", subjects: ["Power", "Machines"], careers: ["Electrical Engineer"] },
+          { name: "AI & DS", duration: "4 years", subjects: ["ML", "Statistics"], careers: ["Data Scientist"] },
+          { name: "Mechanical", duration: "4 years", subjects: ["Thermodynamics", "Manufacturing"], careers: ["Design Engineer"] },
+          { name: "Civil", duration: "4 years", subjects: ["Structures", "Construction"], careers: ["Site Engineer"] },
+        ]
+      },
+
+      Degree: {
+        _subLabel: "Degree Program",
+        _sub: ["B.Sc", "B.Com", "BA", "BBA", "BCA"],
+        "B.Sc": [
+          { type: "B.Sc", name: "Computer Science", duration: "3 years", subjects: ["Programming", "DSA", "DBMS"], careers: ["Software Dev", "QA"] },
+          { type: "B.Sc", name: "Mathematics", duration: "3 years", subjects: ["Algebra", "Calculus"], careers: ["Data Analyst", "Academia"] },
+          { type: "B.Sc", name: "Physics", duration: "3 years", subjects: ["Mechanics", "EM"], careers: ["Research", "Testing"] },
+          { type: "B.Sc", name: "Biotechnology", duration: "3 years", subjects: ["Genetics", "Cell Bio"], careers: ["Biotech Associate"] },
+        ],
+        "B.Com": [
+          { type: "B.Com", name: "General", duration: "3 years", subjects: ["Accounting", "Tax"], careers: ["Accountant", "Banking"] },
+          { type: "B.Com", name: "Computers", duration: "3 years", subjects: ["Accounting", "IT"], careers: ["MIS", "ERP"] },
+          { type: "B.Com", name: "Accounting & Finance", duration: "3 years", subjects: ["AFM", "Audit"], careers: ["Finance Analyst"] },
+        ],
+        "BA": [
+          { type: "BA", name: "Economics", duration: "3 years", subjects: ["Micro/Macro"], careers: ["Policy", "Analytics"] },
+          { type: "BA", name: "Psychology", duration: "3 years", subjects: ["Cognitive", "Counselling"], careers: ["Counsellor", "HR"] },
+          { type: "BA", name: "English", duration: "3 years", subjects: ["Literature", "Writing"], careers: ["Content", "Teaching"] },
+        ],
+        "BBA": [
+          { type: "BBA", name: "General", duration: "3 years", subjects: ["Marketing", "Finance", "HR"], careers: ["Management Trainee", "Operations"] },
+        ],
+        "BCA": [
+          { type: "BCA", name: "Computer Applications", duration: "3 years", subjects: ["Programming", "Web"], careers: ["Software Dev", "Support Engineer"] },
+        ]
+      }
+    };
+
+    // --- Helpers ------------------------------------------------------------
+    const el = (q) => document.querySelector(q);
+    const results = el('#results');
+    const details = el('#details');
+    const levelSel = el('#level');
+    const subWrap = el('#subFieldWrap');
+    const subLabel = el('#subLabel');
+    const subSel = el('#subField');
+    const search = el('#q');
+
+    function clear(node) { node.innerHTML = ''; }
+
+    function renderCards(items) {
+      clear(results);
+      details.hidden = true; details.innerHTML = '';
+      if (!items || !items.length) {
+        results.innerHTML = `<div class="empty" style="grid-column: span 12">No results. Try a different stream/program or search term.</div>`;
+        return;
+      }
+      items.forEach((it, idx) => {
+        const card = document.createElement('article');
+        card.className = 'card';
+        card.tabIndex = 0;
+        card.setAttribute('role', 'button');
+        card.setAttribute('aria-label', `${it.type ? it.type + ' - ' : ''}${it.name || it.type}`);
+        card.innerHTML = `
+          <span class="badge">${it.type || 'Branch'}</span>
+          <h3>${it.name || it.type}</h3>
+          <div class="meta">Duration: ${it.duration || 'NA'}</div>
+          <div class="meta">Core: ${(it.subjects||[]).slice(0,3).join(', ')}</div>
+        `;
+        card.addEventListener('click', () => showDetails(it));
+        card.addEventListener('keypress', (e) => { if (e.key === 'Enter') showDetails(it); });
+        results.appendChild(card);
+      });
+    }
+
+    function showDetails(it) {
+      details.hidden = false;
+      details.innerHTML = `
+        <h2>${it.type ? it.type + ' · ' : ''}${it.name || it.type}</h2>
+        ${it.duration ? `<p><strong>Duration:</strong> ${it.duration}</p>` : ''}
+        ${it.subjects ? `<p><strong>Core Subjects:</strong></p><ul>${it.subjects.map(s => `<li>${s}</li>`).join('')}</ul>` : ''}
+        ${it.careers ? `<p><strong>Career Paths:</strong></p><ul>${it.careers.map(c => `<li>${c}</li>`).join('')}</ul>` : ''}
+        <p class="small" style="color: var(--muted); margin-top:10px">Note: Details are general guidance and may vary by university or country.</p>
+      `;
+      details.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function getItems() {
+      const level = levelSel.value;
+      const query = (search.value || '').toLowerCase().trim();
+
+      if (level === 'Intermediate') {
+        subWrap.style.display = 'grid';
+        subLabel.textContent = DATA.Intermediate._subLabel;
+        ensureSubOptions(DATA.Intermediate._sub);
+        const key = subSel.value || DATA.Intermediate._sub[0];
+        const list = DATA.Intermediate[key] || [];
+        return filterByQuery(list, query);
+      }
+
+      if (level === 'BTech') {
+        subWrap.style.display = 'none';
+        const list = DATA.BTech.list;
+        return filterByQuery(list, query);
+      }
+
+      if (level === 'Degree') {
+        subWrap.style.display = 'grid';
+        subLabel.textContent = DATA.Degree._subLabel;
+        ensureSubOptions(DATA.Degree._sub);
+        const key = subSel.value || DATA.Degree._sub[0];
+        const list = DATA.Degree[key] || [];
+        return filterByQuery(list, query);
+      }
+
+      return [];
+    }
+
+    function ensureSubOptions(options) {
+      const current = Array.from(subSel.options).map(o => o.value);
+      const same = options && current.length === options.length && options.every((v, i) => v === current[i]);
+      if (same) return;
+      clear(subSel);
+      (options || []).forEach(o => {
+        const opt = document.createElement('option');
+        opt.value = o; opt.textContent = o; subSel.appendChild(opt);
+      });
+    }
+
+    function filterByQuery(list, query) {
+      if (!query) return list;
+      return list.filter(it =>
+        (it.name && it.name.toLowerCase().includes(query)) ||
+        (it.type && it.type.toLowerCase().includes(query)) ||
+        (it.subjects && it.subjects.some(s => s.toLowerCase().includes(query))) ||
+        (it.careers && it.careers.some(c => c.toLowerCase().includes(query)))
+      );
+    }
+
+    // --- Init ---------------------------------------------------------------
+    function render() { renderCards(getItems()); }
+
+    levelSel.addEventListener('change', () => { render(); });
+    subSel.addEventListener('change', render);
+    search.addEventListener('input', render);
+    document.getElementById('printBtn').addEventListener('click', () => window.print());
+
+    // boot
+    render();
+  </script>
+</body>
+</html>
